@@ -1,0 +1,439 @@
+swagger: '2.0'
+host: service.api.metro.tokyo.lg.jp
+basePath: /
+schemes:
+- https
+info:
+  title: 資源回収・ごみ収集日一覧 API
+  description: 【江東区】資源回収・ごみ収集日一覧です。江東区の資源回収・ごみ収集日についての情報を提供します。
+  version: 1.0.1
+  contact:
+    name: 江東区
+    url: https://www.city.koto.lg.jp/
+  license:
+    name: クリエイティブ・コモンズ 表示（CC BY）
+    url: https://creativecommons.org/licenses/by/4.0/deed.ja
+paths:
+  /api/t131083d0000000022-6fcf66e9663166b9ca4c273a2a45304a-0/json:
+    post:
+      tags:
+      - 資源回収・ごみ収集日
+      summary: 資源回収・ごみ収集日一覧（JSON形式）
+      description: 江東区の資源回収・ごみ収集日の情報をJSON形式で取得します。
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: limit
+        in: query
+        description: 1回のAPI呼び出しで取得するデータ件数の上限を指定します。デフォルト値は100、最小値は0、最大値は1000です。
+        type: integer
+        default: 100
+        minimum: 0
+        maximum: 1000
+        required: false
+      - name: offset
+        in: query
+        description: データの取得開始位置を指定します。一定件数毎に分けてデータを取得する場合に利用します。
+        type: integer
+        required: false
+      - in: body
+        name: requestBody
+        required: true
+        description: 詳細な絞り込み検索をする場合に本項目を指定してください。簡単に実行するためには中身を{}とすることでエラーなく取得することができます。
+        schema:
+          $ref: '#/definitions/RequestBody'
+      responses:
+        '200':
+          description: 処理が正常に終了しました。
+          schema:
+            $ref: '#/definitions/JsonResponse'
+        '400':
+          description: リクエストパラメータが不正です。
+        '405':
+          description: APIが無効化されています。
+        '500':
+          description: 内部エラーが発生しました。
+  /api/t131083d0000000022-6fcf66e9663166b9ca4c273a2a45304a-0/xml:
+    post:
+      tags:
+      - 資源回収・ごみ収集日
+      summary: 資源回収・ごみ収集日一覧（XML形式）
+      description: 江東区の資源回収・ごみ収集日の情報をXML形式で取得します。
+      consumes:
+      - application/json
+      produces:
+      - application/xml
+      parameters:
+      - name: encoding
+        in: query
+        description: 出力文字コードを指定します。
+        type: string
+        enum:
+        - utf-8
+        - sjis
+        default: utf-8
+        required: true
+      - name: limit
+        in: query
+        description: 1回のAPI呼び出しで取得するデータ件数の上限を指定します。
+        type: integer
+        default: 100
+        minimum: 0
+        maximum: 1000
+        required: false
+      - name: offset
+        in: query
+        description: データの取得開始位置を指定します。
+        type: integer
+        required: false
+      - in: body
+        name: requestBody
+        required: true
+        description: 詳細な絞り込み検索をする場合に本項目を指定してください。
+        schema:
+          $ref: '#/definitions/RequestBody'
+      responses:
+        '200':
+          description: 処理が正常に終了しました。
+          schema:
+            $ref: '#/definitions/XmlResponse'
+        '400':
+          description: リクエストパラメータが不正です。
+        '405':
+          description: APIが無効化されています。
+        '500':
+          description: 内部エラーが発生しました。
+definitions:
+  RequestBody:
+    type: object
+    properties:
+      column:
+        type: array
+        description: 取得したい項目名を指定します。
+        items:
+          type: string
+          enum:
+          - じゅうしょ
+          - 住所
+          - 地区番号
+          - 資源
+          - 容器包装プラスチック
+          - 燃やすごみ
+          - 燃やさないごみ
+        example:
+        - 住所
+        - 地区番号
+        - 資源
+        - 燃やすごみ
+      searchCondition:
+        type: object
+        description: 絞り込み条件を指定します。
+        properties:
+          conditionRelationship:
+            type: string
+            enum:
+            - and
+            - or
+            default: and
+            description: 絞り込み条件間の関係を指定します。
+          stringAndSearch:
+            type: array
+            description: 文字列項目について絞り込み条件(AND条件)を設定します。
+            items:
+              type: object
+              required:
+              - column
+              - relationship
+              - condition
+              properties:
+                column:
+                  type: string
+                  description: 範囲指定をしたい文字列項目を指定します。
+                  enum:
+                  - じゅうしょ
+                  - 住所
+                  - 資源
+                  - 容器包装プラスチック
+                  - 燃やすごみ
+                  - 燃やさないごみ
+                relationship:
+                  type: string
+                  enum:
+                  - eq
+                  - contains
+                  - startsWith
+                  - endsWith
+                  description: 項目名と条件の関係を指定します。
+                condition:
+                  type: string
+                  description: 絞り込む内容を指定します。
+          stringOrSearch:
+            type: array
+            description: 文字列項目について絞り込み条件(OR条件)を設定します。
+            items:
+              type: object
+              required:
+              - column
+              - relationship
+              - condition
+              properties:
+                column:
+                  type: string
+                  description: 範囲指定をしたい文字列項目を指定します。
+                  enum:
+                  - じゅうしょ
+                  - 住所
+                  - 資源
+                  - 容器包装プラスチック
+                  - 燃やすごみ
+                  - 燃やさないごみ
+                relationship:
+                  type: string
+                  enum:
+                  - eq
+                  - contains
+                  - startsWith
+                  - endsWith
+                  description: 項目名と条件の関係を指定します。
+                condition:
+                  type: string
+                  description: 絞り込む内容を指定します。
+          numericAndSearch:
+            type: array
+            description: 数値項目について絞り込み条件(AND条件)を設定します。
+            items:
+              type: object
+              required:
+              - column
+              - relationship
+              - condition
+              properties:
+                column:
+                  type: string
+                  description: 範囲指定をしたい数値項目を指定します。
+                  enum:
+                  - 地区番号
+                relationship:
+                  type: string
+                  enum:
+                  - eq
+                  - le
+                  - lt
+                  - ge
+                  - gt
+                  description: 項目名と条件の関係を指定します。
+                condition:
+                  type: number
+                  description: 絞り込む内容を指定します。
+          numericOrSearch:
+            type: array
+            description: 数値項目について絞り込み条件(OR条件)を設定します。
+            items:
+              type: object
+              required:
+              - column
+              - relationship
+              - condition
+              properties:
+                column:
+                  type: string
+                  description: 範囲指定をしたい数値項目を指定します。
+                  enum:
+                  - 地区番号
+                relationship:
+                  type: string
+                  enum:
+                  - eq
+                  - le
+                  - lt
+                  - ge
+                  - gt
+                  description: 項目名と条件の関係を指定します。
+                condition:
+                  type: number
+                  description: 絞り込む内容を指定します。
+      sortOrder:
+        type: object
+        description: ソート条件を指定します。
+        properties:
+          column:
+            type: string
+            description: ソートする列を1つ指定できます。
+            enum:
+            - じゅうしょ
+            - 住所
+            - 地区番号
+            - 資源
+            - 容器包装プラスチック
+            - 燃やすごみ
+            - 燃やさないごみ
+          order:
+            type: string
+            enum:
+            - asc
+            - desc
+            default: asc
+            description: ソート順序を指定します。
+    example:
+      column:
+      - 住所
+      - 地区番号
+      - 資源
+      - 燃やすごみ
+      - 燃やさないごみ
+      searchCondition:
+        stringAndSearch:
+        - column: 住所
+          relationship: contains
+          condition: 深川
+      sortOrder:
+        column: 地区番号
+        order: asc
+  JsonResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        description: 検索結果の総件数です。
+      subtotal:
+        type: integer
+        description: 検索結果のうち今回のレスポンスで返却している件数です。
+      limit:
+        type: integer
+        description: リクエスト時に指定した値が設定されます。
+      offset:
+        type: integer
+        description: リクエスト時に指定した値が設定されます。
+      metadata:
+        type: object
+        properties:
+          apiId:
+            type: string
+            description: API ID
+          title:
+            type: string
+            description: API名
+          datasetId:
+            type: string
+            description: データセットID
+          datasetTitle:
+            type: string
+            description: データセットタイトル
+          datasetDesc:
+            type: string
+            description: データセット説明
+          dataTitle:
+            type: string
+            description: データタイトル
+          dataDesc:
+            type: string
+            description: データ説明
+          sheetname:
+            type: string
+            description: シート名
+          version:
+            type: string
+            description: APIのデータバージョン
+          created:
+            type: string
+            description: 作成日
+          updated:
+            type: string
+            description: 更新日
+      hits:
+        type: array
+        description: 検索結果データの配列
+        items:
+          type: object
+          properties:
+            row:
+              type: integer
+              description: 行番号
+            じゅうしょ:
+              type: string
+              description: 住所（ふりがな）
+            住所:
+              type: string
+              description: 住所
+            地区番号:
+              type: number
+              description: 地区番号
+            資源:
+              type: string
+              description: 資源の収集日
+            容器包装プラスチック:
+              type: string
+              description: 容器包装プラスチックの収集日
+            燃やすごみ:
+              type: string
+              description: 燃やすごみの収集日
+            燃やさないごみ:
+              type: string
+              description: 燃やさないごみの収集日
+  XmlResponse:
+    type: object
+    xml:
+      name: result
+    properties:
+      total:
+        type: integer
+        description: 検索結果の総件数
+      subtotal:
+        type: integer
+        description: 今回のレスポンスで返却している件数
+      limit:
+        type: integer
+        description: リクエスト時に指定した値
+      offset:
+        type: integer
+        description: リクエスト時に指定した値
+      metadata:
+        type: object
+        properties:
+          apiId:
+            type: string
+          title:
+            type: string
+          datasetId:
+            type: string
+          datasetTitle:
+            type: string
+          datasetDesc:
+            type: string
+          dataTitle:
+            type: string
+          dataDesc:
+            type: string
+          sheetname:
+            type: string
+          version:
+            type: string
+          created:
+            type: string
+          updated:
+            type: string
+      hits:
+        type: array
+        xml:
+          wrapped: true
+        items:
+          type: object
+          xml:
+            name: item
+          properties:
+            prop:
+              type: array
+              items:
+                type: object
+                properties:
+                  rownum:
+                    type: integer
+                  key:
+                    type: string
+                  value:
+                    type: string
+externalDocs:
+  description: 東京都オープンデータカタログサイト
+  url: https://catalog.data.metro.tokyo.lg.jp/dataset/t131083d0000000022
